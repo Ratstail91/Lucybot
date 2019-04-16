@@ -1,0 +1,15 @@
+{
+	"help": "Please use !help subject.\nSubjects include: shuffleall, shuffle, draw, show, play",
+
+	"helpShuffleall": "Shuffleall: Shuffles everything into the deck.",
+	"helpShuffle": "Shuffle: Shuffle the current deck.",
+	"helpDraw": "Draw [x]: Draw x number of cards, and discard non-aces.",
+	"helpShow": "Show: Show your current hand.",
+	"helpPlay": "Play [card]: play a card, and shuffle it into the deck.",
+
+	"shuffle": "Shuffled",
+	"shuffleall": "Shuffled all",
+	"play": "Played a card",
+
+	"fail": "failed an action"
+}
