@@ -7,7 +7,7 @@ let client = new discord.Client();
 
 // Bot Modules
 let {sendPublicMessage, sendPrivateMessage, generateDialogFunction, isAdmin} = require("./utility.js");
-let {debug, reshuffleDeck, shuffleDeck, drawFromDeck, showHand, playCard} = require("./card_utility.js");
+let {debug, reset, add, shuffle, draw, send, read, clear} = require("./card_utility.js");
 
 //dialog system
 let dialog = generateDialogFunction(require("./dialog.json"));
@@ -52,9 +52,6 @@ client.on('ready', async () => {
 	}
 
 	console.log("Logged in as: " + client.user.username + " - " + client.user.id);
-
-	//initialize the deck
-	reshuffleDeck();
 });
 
 // Create an event listener for messages
@@ -98,37 +95,65 @@ function processBasicCommands(client, message) {
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0]));
 			return true;
 
-		case "shuffleall":
-			//shuffles everything into the active pile
-			reshuffleDeck();
+		//reset - reset your deck, hand and discard to nil
+		case "reset":
+			reset(message.author);
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
-			return true;
+			break;
 
-		case "shuffle":
-			//shuffles the active pile
-			shuffleDeck();
-			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
-			return true;
-
-		case "draw":
-			//read out the cards, moving everything but aces to the discard pile
-			sendPublicMessage(client, message.guild, message.author, message.channel, drawFromDeck(message.author.username, args[0]));
-			return true;
-
-		case "show":
-			//show cards in hand
-			sendPublicMessage(client, message.guild, message.author, message.channel, showHand(message.author.username));
-			return true;
-
-		case "play":
-			//plays X card from your hand by showing it then moving it to the active pile
-			if (playCard(message.author.username, args[0])) {
-				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
+		//add X - add x to your personal deck
+		case "add":
+			if (add(message.author, args[0])) {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0]));
 			} else {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
 			}
-			return true;
+			break;
 
+		//shuffle - shuffle your discard into your deck
+		case "shuffle":
+			shuffle(message.author);
+			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
+			break;
+
+		//draw X - move x number of cards from deck to hand
+		case "draw":
+			let count = draw(message.author, args[0]);
+			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, count));
+			break;
+
+		//send X Y - send card X to pile Y (or discard)
+		case "send":
+			if (send(message.author, args[0], args[1])) {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0], args[1]));
+			} else {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
+			}
+			break;
+
+		//read Y - display contents of pile Y (or hand/discard)
+		case "read":
+			let res = read(message.author, args[0]);
+			if (res === false) {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
+			} else {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0], res));
+			}
+			break;
+
+		//clear Y - clear out the contents of pile Y
+		case "clear":
+			if (clear(args[0])) {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0]));
+			} else {
+				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
+			}
+			break;
+
+		//debugging
+		case "debug":
+			debug();
+			break;
 
 		default:
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
@@ -150,7 +175,7 @@ function processAdminCommands(client, message) {
 			return true;
 
 		case "debug":
-			debug();
+			debug(message.author);
 			return true;
 	}
 

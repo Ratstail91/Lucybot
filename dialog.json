@@ -1,15 +1,21 @@
 {
-	"help": "Please use !help subject.\nSubjects include: shuffleall, shuffle, draw, show, play",
+	"help": "Please use !help subject.\nSubjects include: reset, add, shuffle, draw, send, read, clear",
 
-	"helpShuffleall": "Shuffleall: Shuffles everything into the deck.",
-	"helpShuffle": "Shuffle: Shuffle the current deck.",
-	"helpDraw": "Draw [x]: Draw x number of cards, and discard non-aces.",
-	"helpShow": "Show: Show your current hand.",
-	"helpPlay": "Play [card]: play a card, and shuffle it into the deck.",
+	"helpReset": "Empties your hand, deck and discard pile.",
+	"helpAdd": "Adds the given card to your deck.",
+	"helpShuffle": "Shuffles your discard pile into your deck.",
+	"helpDraw": "Draw X cards from your deck.",
+	"helpSend": "Send a card from your hand to a pile (1, 2, 3) or discard.",
+	"helpRead": "Read out the content of a pile (1, 2, 3), hand or discard.",
+	"helpClear": "Empty the contents of a pile (1, 2, 3).",
 
-	"shuffle": "Shuffled",
-	"shuffleall": "Shuffled all",
-	"play": "Played a card",
+	"fail": "failed an action.",
 
-	"fail": "failed an action"
+	"reset": "Your hand, deck and discard pile are now empty.",
+	"add": "Added {1} to your deck.",
+	"shuffle": "Discard and deck have been shuffled.",
+	"draw": "You drew {1} cards.",
+	"send": "Sent card {1} to pile {2}.",
+	"read": "Pile {1} contains: {2}",
+	"clear": "Cleared out the contents of pile {1}."
 }
