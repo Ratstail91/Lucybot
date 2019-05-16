@@ -7,19 +7,20 @@ exports = module.exports = {};
 //		"username": {
 //			"deck": ["card-name", ...],
 //			"hand": ["card-name", ...],
-//			"discard": ["card-name", ...]
+//			"discard": ["card-name", ...],
+//			"minor": ["card-name", ...],
+//			"major": ["card-name", ...],
+//			"removed": ["card-name", ...]
 //		},
 //		...
 //	}
 
 //game data
 let players = {};
-let piles = [[], [], []];
 
 //dump the state
 exports.debug = function() {
 	console.log(players);
-	console.log(piles);
 }
 
 //reset this player's state
@@ -36,10 +37,19 @@ exports.add = function(user, cardname) {
 		return false;
 	}
 
-	if (players[user].deck.indexOf(cardname) != -1 || players[user].hand.indexOf(cardname) != -1 || players[user].discard.indexOf(cardname) != -1) {
+	//card is not already owned
+	if (
+		players[user].deck.indexOf(cardname) != -1 ||
+		players[user].hand.indexOf(cardname) != -1 ||
+		players[user].discard.indexOf(cardname) != -1 ||
+		players[user].minor.indexOf(cardname) != -1 ||
+		players[user].major.indexOf(cardname) != -1 ||
+		players[user].removed.indexOf(cardname) != -1
+	) {
 		return false;
 	}
 
+	//add to the deck
 	players[user].deck.push(cardname);
 
 	return true;
@@ -57,7 +67,7 @@ exports.shuffle = function(user) {
 	let newDeck = [];
 
 	while(players[user].deck.length > 0) {
-		newDeck.push( players[user].deck.splice(Math.floor(Math.random() * players[user].deck.length), 1)[0])
+		newDeck.push( players[user].deck.splice(Math.floor(Math.random() * players[user].deck.length), 1)[0]);
 	}
 
 	players[user].deck = newDeck;
@@ -67,16 +77,20 @@ exports.shuffle = function(user) {
 exports.draw = function(user, cardCount) {
 	verifyPlayer(user);
 
+	//check is a number
 	cardCount = parseInt(cardCount);
 
 	if (isNaN(cardCount)) {
 		return 0;
 	}
 
+	//can only draw this much
 	cardCount = cardCount > players[user].deck.length ? players[user].deck.length : cardCount;
 
+	//draw
 	players[user].hand = players[user].hand.concat( players[user].deck.splice(0, cardCount) );
 
+	//return the amount drawn
 	return cardCount;
 }
 
@@ -98,21 +112,26 @@ exports.send = function(user, cardname, destination) {
 		return true;
 	}
 
-	//verify sending to a pile
-	destination = parseInt(destination);
-	if (isNaN(destination)) {
-		return false;
+	//minor a card
+	if (destination === "minor") {
+		players[user].minor.push( players[user].hand.splice(players[user].hand.indexOf(cardname), 1)[0] );
+		return true;
 	}
 
-	if (destination < 1 || destination > 3) {
-		return false;
+	//major a card
+	if (destination === "major") {
+		players[user].major.push( players[user].hand.splice(players[user].hand.indexOf(cardname), 1)[0] );
+		return true;
 	}
 
-	//place in a discard pile
-	piles[destination-1].push( players[user].hand.splice(players[user].hand.indexOf(cardname), 1)[0] );
+	//removed a card
+	if (destination === "removed") {
+		players[user].removed.push( players[user].hand.splice(players[user].hand.indexOf(cardname), 1)[0] );
+		return true;
+	}
 
-	//finally
-	return true;
+	//otherwise
+	return false;
 }
 
 exports.read = function(user, destination) {
@@ -126,32 +145,62 @@ exports.read = function(user, destination) {
 		return players[user].discard.toString();
 	}
 
-	destination = parseInt(destination);
-	if (isNaN(destination)) {
-		return false;
+	if (destination === "minor") {
+		return players[user].minor.toString();
 	}
 
-	if (destination < 1 || destination > 3) {
-		return false;
+	if (destination === "major") {
+		return players[user].major.toString();
 	}
 
-	return piles[destination-1].toString();
+	if (destination === "removed") {
+		return players[user].removed.toString();
+	}
+
+	return false;
 }
 
-exports.clear = function(destination) {
-	destination = parseInt(destination);
-	if (isNaN(destination)) {
-		return false;
+exports.clear = function(user, destination) {
+	verifyPlayer(user);
+
+	if (destination === "deck") {
+		delete players[user].deck;
+		players[user].deck = [];
+		return true;
 	}
 
-	if (destination < 1 || destination > 3) {
-		return false;
+	if (destination === "hand") {
+		delete players[user].hand;
+		players[user].hand = [];
+		return true;
 	}
 
-	delete piles[destination-1];
-	piles[destination-1] = [];
+	if (destination === "discard") {
+		delete players[user].discard;
+		players[user].discard = [];
+		return true;
+	}
 
-	return true;
+	if (destination === "minor") {
+		delete players[user].minor;
+		players[user].minor = [];
+		return true;
+	}
+
+	if (destination === "major") {
+		delete players[user].major;
+		players[user].major = [];
+		return true;
+	}
+
+	if (destination === "removed") {
+		delete players[user].removed;
+		players[user].removed = [];
+		return true;
+	}
+
+	//otherwise
+	return false;
 }
 
 //-------------------------
@@ -230,5 +279,17 @@ let verifyPlayer = function(username) {
 
 	if (players[username]["discard"] === undefined) {
 		players[username]["discard"] = [];
+	}
+
+	if (players[username]["minor"] === undefined) {
+		players[username]["minor"] = [];
+	}
+
+	if (players[username]["major"] === undefined) {
+		players[username]["major"] = [];
+	}
+
+	if (players[username]["removed"] === undefined) {
+		players[username]["removed"] = [];
 	}
 }

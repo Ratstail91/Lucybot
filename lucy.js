@@ -99,7 +99,7 @@ function processBasicCommands(client, message) {
 		case "reset":
 			reset(message.author);
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
-			break;
+			return true;
 
 		//add X - add x to your personal deck
 		case "add":
@@ -108,19 +108,19 @@ function processBasicCommands(client, message) {
 			} else {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
 			}
-			break;
+			return true;
 
 		//shuffle - shuffle your discard into your deck
 		case "shuffle":
 			shuffle(message.author);
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
-			break;
+			return true;
 
 		//draw X - move x number of cards from deck to hand
 		case "draw":
 			let count = draw(message.author, args[0]);
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, count));
-			break;
+			return true;
 
 		//send X Y - send card X to pile Y (or discard)
 		case "send":
@@ -129,7 +129,7 @@ function processBasicCommands(client, message) {
 			} else {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
 			}
-			break;
+			return true;
 
 		//read Y - display contents of pile Y (or hand/discard)
 		case "read":
@@ -139,21 +139,16 @@ function processBasicCommands(client, message) {
 			} else {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0], res));
 			}
-			break;
+			return true;
 
 		//clear Y - clear out the contents of pile Y
 		case "clear":
-			if (clear(args[0])) {
+			if (clear(message.author, args[0])) {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command, args[0]));
 			} else {
 				sendPublicMessage(client, message.guild, message.author, message.channel, dialog("fail"));
 			}
-			break;
-
-		//debugging
-		case "debug":
-			debug();
-			break;
+			return true;
 
 		default:
 			sendPublicMessage(client, message.guild, message.author, message.channel, dialog(command));
@@ -174,8 +169,9 @@ function processAdminCommands(client, message) {
 			sendPublicMessage(client, message.guild, message.author, message.channel, "PONG!");
 			return true;
 
+		//debugging
 		case "debug":
-			debug(message.author);
+			debug();
 			return true;
 	}
 

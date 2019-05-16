@@ -1,17 +1,17 @@
 {
 	"help": "Please use !help subject.\nSubjects include: reset, add, shuffle, draw, send, read, clear",
 
-	"helpReset": "Empties your hand, deck and discard pile.",
+	"helpReset": "Resets all of your piles to nil.",
 	"helpAdd": "Adds the given card to your deck.",
 	"helpShuffle": "Shuffles your discard pile into your deck.",
 	"helpDraw": "Draw X cards from your deck.",
-	"helpSend": "Send a card from your hand to a pile (1, 2, 3) or discard.",
-	"helpRead": "Read out the content of a pile (1, 2, 3), hand or discard.",
-	"helpClear": "Empty the contents of a pile (1, 2, 3).",
+	"helpSend": "Send a card from your hand to a pile (discard, minor, major, removed).",
+	"helpRead": "Read out the content of a pile (hand, discard, minor, major, removed).",
+	"helpClear": "Empty the contents of a pile (deck, hand, discard, minor, major, removed).",
 
 	"fail": "failed an action.",
 
-	"reset": "Your hand, deck and discard pile are now empty.",
+	"reset": "All of your piles are now empty.",
 	"add": "Added {1} to your deck.",
 	"shuffle": "Discard and deck have been shuffled.",
 	"draw": "You drew {1} cards.",
